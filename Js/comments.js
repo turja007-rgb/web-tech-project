@@ -14,7 +14,16 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
     })
     .then(res => res.json())
     .then(data => {
-        if(data.id) {
+        let errorDiv = document.getElementById('error-message');
+        
+        
+        if(data.error) {
+            errorDiv.innerText = data.error;
+            errorDiv.style.display = 'block'; 
+        } 
+        
+        else if(data.id) {
+            errorDiv.style.display = 'none'; 
             
             let html = `
                 <div class="comment" id="comment-${data.id}">
@@ -38,7 +47,7 @@ function deleteComment(commentId) {
         if(data.ok) {
             let el = document.getElementById(`comment-${commentId}`);
             el.classList.add('fade-out');
-            setTimeout(() => el.remove(), 500); 
+            setTimeout(() => el.remove(), 500);
         }
     });
 }

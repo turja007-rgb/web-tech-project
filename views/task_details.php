@@ -43,9 +43,12 @@ $comments = $stmt->get_result();
         <?php endwhile; ?>
     </div>
     
-    <form id="comment-form">
+   <form id="comment-form">
         <input type="hidden" id="task_id" value="<?= $task_id ?>"> 
-        <textarea id="comment_body" placeholder="Write a comment..." required></textarea>
+        
+        <div id="error-message" style="color: red; margin-bottom: 10px; display: none; font-weight: bold;"></div>
+        
+        <textarea id="comment_body" placeholder="Write a comment..."></textarea>
         <button type="submit">Post Comment</button>
     </form>
 </div>
