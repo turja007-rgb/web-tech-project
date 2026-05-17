@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db   = 'task_management'; 
+$db   = 'project_management'; 
 $user = 'root';
 $pass = '';
 

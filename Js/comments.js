@@ -15,11 +15,12 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
     .then(res => res.json())
     .then(data => {
         if(data.id) {
+            
             let html = `
                 <div class="comment" id="comment-${data.id}">
                     <strong>${data.author_name}</strong>: ${data.body} 
-                    <small>${data.created_at}</small>
-                    <a href="#" onclick="deleteComment(${data.id}); return false;">Delete</a>
+                    <small class="time-text">${data.created_at}</small>
+                    <a href="#" onclick="deleteComment(${data.id}); return false;" class="delete-btn">Delete</a>
                 </div>
             `;
             document.getElementById('comment-thread').insertAdjacentHTML('beforeend', html);

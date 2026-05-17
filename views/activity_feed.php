@@ -1,9 +1,14 @@
 <?php
 session_start();
+
+
+$_SESSION['user_id'] = 1;
+$_SESSION['name'] = 'Mim';
+
+
 require_once '../config/db.php';
 
-$project_id = 1; 
-
+$project_id = 4; 
 
 $stmt = $conn->prepare("
     SELECT u.id, u.name 
@@ -16,11 +21,21 @@ $stmt->execute();
 $members = $stmt->get_result();
 ?>
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Activity Feed</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
 <div class="activity-page">
-    <h2>Project Activity</h2>
+    <h3>Project Activity</h3>
     <input type="hidden" id="project_id" value="<?= $project_id ?>"> 
     
-    <select id="member-filter">
+    <select id="member-filter" style="margin-bottom: 20px; padding: 10px; width: 100%; border-radius: 8px; border: 1px solid #ccc;">
         <option value="">All Members</option>
         <?php while($m = $members->fetch_assoc()): ?>
             <option value="<?= $m['id'] ?>"><?= htmlspecialchars($m['name']) ?></option>
@@ -31,4 +46,6 @@ $members = $stmt->get_result();
         </div>
 </div>
 
-<script src="../assets/js/activity.js"></script>
+<script src="../js/activity.js"></script>
+</body>
+</html>
