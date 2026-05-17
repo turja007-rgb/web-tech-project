@@ -8,7 +8,7 @@ $_SESSION['name'] = 'Mim';
 
 require_once '../config/db.php';
 
-$project_id = 4; 
+ $task_id = isset($_GET['task_id']) ? (int)$_GET['task_id'] : 1;
 
 $stmt = $conn->prepare("
     SELECT u.id, u.name 

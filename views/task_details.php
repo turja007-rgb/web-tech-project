@@ -9,7 +9,7 @@ $_SESSION['name'] = 'Mim';
 require_once '../config/db.php';
 require_once '../config/helpers.php';
 
-$task_id = 1; 
+ $task_id = isset($_GET['task_id']) ? (int)$_GET['task_id'] : 1;
 
 $stmt = $conn->prepare("SELECT c.*, u.name FROM comments c JOIN users u ON c.user_id = u.id WHERE c.task_id = ? ORDER BY c.created_at ASC");
 $stmt->bind_param("i", $task_id);
