@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db   = 'task_management'; // আপনার ডাটাবেসের নাম
+$db   = 'task_management'; 
 $user = 'root';
 $pass = '';
 
