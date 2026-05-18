@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+$_SESSION['user_id'] = 1;
+$_SESSION['name'] = 'Mim';
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit;
@@ -59,6 +62,11 @@ $comments = $stmt->get_result();
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
+    
+<div style="text-align: center; margin: 20px 0;">
+    <a href="activity_feed.php?project_id=4" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">➡️ Go to Activity Feed</a>
+</div
+
 
 <div class="task-details">
 

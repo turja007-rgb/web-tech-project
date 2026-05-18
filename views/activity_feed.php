@@ -1,6 +1,9 @@
 <?php
 session_start();
 
+$_SESSION['user_id'] = 1;
+$_SESSION['name'] = 'Mim';
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../login.php");
     exit;
@@ -56,6 +59,10 @@ $members = $stmt->get_result();
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
+    
+    <div style="text-align: center; margin: 20px 0;">
+    <a href="task_details.php?task_id=1" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">⬅️ Back to Task Details</a>
+</div>
 
 <div class="activity-page">
 
