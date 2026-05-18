@@ -18,13 +18,17 @@ $author_name = $_SESSION['name'];
 
 $commentModel = new Comment($conn);
 
-// ADD COMMENT
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $task_id = (int) $_POST['task_id'];
     $body = trim($_POST['body']);
 
-    if (empty($body)) {
+    if (empty($body)) 
+
+        
+        
+        {
         echo json_encode([
             'error' => 'Comment cannot be empty'
         ]);
@@ -47,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Security check
+    
     $memberStmt = $conn->prepare(
         "SELECT * FROM project_members
          WHERE project_id = ?
@@ -66,6 +70,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode([
             'error' => 'Access denied'
         ]);
+        exit;
+    }
+
+    $task_res = $commentModel->getTaskDetails($task_id);
+    if (!$task_res) {
+        echo json_encode(['error' => 'Task not found']);
+        exit;
+    }
+
+    
+    $memberStmt = $conn->prepare("SELECT * FROM project_members WHERE project_id = ? AND user_id = ?");
+    $memberStmt->bind_param("ii", $task_res['project_id'], $user_id);
+    $memberStmt->execute();
+    
+    if ($memberStmt->get_result()->num_rows === 0) {
+        echo json_encode(['error' => 'Access denied. You are not a member of this project.']);
         exit;
     }
 
@@ -103,7 +123,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-// DELETE COMMENT
+
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
     $comment_id = (int) $_GET['id'];

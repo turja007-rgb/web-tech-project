@@ -1,24 +1,16 @@
 <?php
 session_start();
 
+
 $_SESSION['user_id'] = 1;
 $_SESSION['name'] = 'Mim';
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php");
-    exit;
-}
 
 require_once '../config/db.php';
 require_once '../config/helpers.php';
 
-$task_id = isset($_GET['task_id']) ? (int)$_GET['task_id'] : 0;
+$task_id = isset($_GET['task_id']) ? (int)$_GET['task_id'] : 1;
 
-if ($task_id <= 0) {
-    die("Invalid task ID");
-}
 
-// Task details
 $taskStmt = $conn->prepare("SELECT * FROM tasks WHERE id = ?");
 $taskStmt->bind_param("i", $task_id);
 $taskStmt->execute();
@@ -28,26 +20,8 @@ if (!$task) {
     die("Task not found");
 }
 
-// Security check
-$memberStmt = $conn->prepare(
-    "SELECT * FROM project_members WHERE project_id = ? AND user_id = ?"
-);
-$memberStmt->bind_param("ii", $task['project_id'], $_SESSION['user_id']);
-$memberStmt->execute();
 
-if ($memberStmt->get_result()->num_rows === 0) {
-    die("Access denied");
-}
-
-// Comments
-$stmt = $conn->prepare(
-    "SELECT c.*, u.name
-     FROM comments c
-     JOIN users u ON c.user_id = u.id
-     WHERE c.task_id = ?
-     ORDER BY c.created_at ASC"
-);
-
+$stmt = $conn->prepare("SELECT c.*, u.name FROM comments c JOIN users u ON c.user_id = u.id WHERE c.task_id = ? ORDER BY c.created_at ASC");
 $stmt->bind_param("i", $task_id);
 $stmt->execute();
 $comments = $stmt->get_result();
@@ -62,88 +36,48 @@ $comments = $stmt->get_result();
     <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    
-<div style="text-align: center; margin: 20px 0;">
-    <a href="activity_feed.php?project_id=4" style="background: #2563eb; color: white; padding: 10px 20px; text-decoration: none; border-radius: 8px; font-weight: bold;">➡️ Go to Activity Feed</a>
-</div
-
 
 <div class="task-details">
-
-    <div class="task-info-box">
-        <h2><?= htmlspecialchars($task['title']) ?></h2>
-
-        <p class="task-description">
+    
+    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #e2e8f0;">
+        <h2 style="color: #1e293b; margin-bottom: 10px; font-size: 22px;"><?= htmlspecialchars($task['title']) ?></h2>
+        <p style="color: #475569; margin-bottom: 15px; line-height: 1.6; font-size: 15px;">
             <?= nl2br(htmlspecialchars($task['description'])) ?>
         </p>
-
-        <div class="task-meta">
-            <span class="badge priority">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <span style="background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
                 Priority: <?= htmlspecialchars($task['priority']) ?>
             </span>
-
-            <span class="badge due-date">
-                Due: <?= htmlspecialchars($task['due_date']) ?>
-            </span>
-
-            <span class="badge status">
+            <span style="background: #dbeafe; color: #1e40af; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold;">
                 Status: <?= htmlspecialchars($task['status']) ?>
             </span>
         </div>
     </div>
-
-    <h3>Task Comments</h3>
-
+    <h3>TASK COMMENTS</h3>
+    
     <div id="comment-thread">
         <?php while($c = $comments->fetch_assoc()): ?>
-
             <div class="comment" id="comment-<?= $c['id'] ?>">
-
-                <strong>
-                    <?= htmlspecialchars($c['name']) ?>
-                </strong>
-
-                :
-
-                <?= htmlspecialchars($c['body']) ?>
-
-                <small class="time-text">
-                    <?= time_elapsed_string($c['created_at']) ?>
-                </small>
-
-                <?php if($c['user_id'] == $_SESSION['user_id']): ?>
-                    <a href="#"
-                       onclick="deleteComment(<?= $c['id'] ?>); return false;"
-                       class="delete-btn">
-                       Delete
-                    </a>
+                <strong><?= htmlspecialchars($c['name']) ?></strong>: <?= htmlspecialchars($c['body']) ?> 
+                <small class="time-text"><?= time_elapsed_string($c['created_at']) ?></small>
+                
+                <?php if(isset($_SESSION['user_id']) && $c['user_id'] == $_SESSION['user_id']): ?>
+                    <a href="#" onclick="deleteComment(<?= $c['id'] ?>); return false;" class="delete-btn">Delete</a>
                 <?php endif; ?>
-
             </div>
-
         <?php endwhile; ?>
     </div>
-
-    <form id="comment-form">
-
-        <input type="hidden" id="task_id" value="<?= $task_id ?>">
-
-        <div id="error-message"></div>
-
-        <textarea
-            id="comment_body"
-            maxlength="500"
-            placeholder="Write a comment..."
-            required>
-        </textarea>
-
-        <button type="submit">
-            Post Comment
-        </button>
-
+    
+   <form id="comment-form">
+        <input type="hidden" id="task_id" value="<?= $task_id ?>"> 
+        
+        <div id="error-message" style="color: red; margin-bottom: 10px; display: none; font-weight: bold;"></div>
+        
+        <textarea id="comment_body" placeholder="Write a comment..."></textarea>
+        <button type="submit">Post Comment</button>
     </form>
 </div>
 
-<script src="../Js/comments.js"></script>
+<script src="../js/comments.js"></script>
 </body>
 </html>
