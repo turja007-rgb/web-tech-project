@@ -1,10 +1,14 @@
-document.getElementById('comment-form').addEventListener('submit', function(e) {
+const commentForm = document.getElementById('comment-form');
+
+commentForm.addEventListener('submit', function (e) {
+
     e.preventDefault();
-    
-    let taskId = document.getElementById('task_id').value;
-    let body = document.getElementById('comment_body').value;
-    
-    let formData = new FormData();
+
+    const taskId = document.getElementById('task_id').value;
+    const body = document.getElementById('comment_body').value;
+
+    const formData = new FormData();
+
     formData.append('task_id', taskId);
     formData.append('body', body);
 
@@ -14,40 +18,68 @@ document.getElementById('comment-form').addEventListener('submit', function(e) {
     })
     .then(res => res.json())
     .then(data => {
-        let errorDiv = document.getElementById('error-message');
-        
-        
-        if(data.error) {
+
+        const errorDiv = document.getElementById('error-message');
+
+        if (data.error) {
+
             errorDiv.innerText = data.error;
-            errorDiv.style.display = 'block'; 
-        } 
-        
-        else if(data.id) {
-            errorDiv.style.display = 'none'; 
-            
-            let html = `
-                <div class="comment" id="comment-${data.id}">
-                    <strong>${data.author_name}</strong>: ${data.body} 
-                    <small class="time-text">${data.created_at}</small>
-                    <a href="#" onclick="deleteComment(${data.id}); return false;" class="delete-btn">Delete</a>
-                </div>
-            `;
-            document.getElementById('comment-thread').insertAdjacentHTML('beforeend', html);
-            document.getElementById('comment_body').value = ''; 
+            errorDiv.style.display = 'block';
+            return;
         }
+
+        errorDiv.style.display = 'none';
+
+        const html = `
+            <div class="comment" id="comment-${data.id}">
+
+                <strong>${data.author_name}</strong>
+
+                : ${data.body}
+
+                <small class="time-text">
+                    Just now
+                </small>
+
+                <a href="#"
+                   onclick="deleteComment(${data.id}); return false;"
+                   class="delete-btn">
+                   Delete
+                </a>
+
+            </div>
+        `;
+
+        document
+            .getElementById('comment-thread')
+            .insertAdjacentHTML('beforeend', html);
+
+        document.getElementById('comment_body').value = '';
     });
 });
 
 function deleteComment(commentId) {
+
     fetch(`../controllers/CommentController.php?id=${commentId}`, {
         method: 'DELETE'
     })
     .then(res => res.json())
     .then(data => {
-        if(data.ok) {
-            let el = document.getElementById(`comment-${commentId}`);
+
+        if (data.ok) {
+
+            const el = document.getElementById(`comment-${commentId}`);
+
             el.classList.add('fade-out');
-            setTimeout(() => el.remove(), 500);
+
+            setTimeout(() => {
+                el.remove();
+            }, 500);
+
+        } else {
+
+            alert(data.error);
+
         }
     });
 }

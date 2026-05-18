@@ -1,23 +1,62 @@
 function loadActivity() {
-    let projectId = document.getElementById('project_id').value;
-    let userId = document.getElementById('member-filter').value;
-    
-    fetch(`../controllers/ActivityController.php?project_id=${projectId}&user_id=${userId}`)
+
+    const projectId =
+        document.getElementById('project_id').value;
+
+    const userId =
+        document.getElementById('member-filter').value;
+
+    fetch(
+        `../controllers/ActivityController.php?project_id=${projectId}&user_id=${userId}`
+    )
     .then(res => res.json())
     .then(data => {
+
         let html = '';
-        data.forEach(log => {
-            html += `
-                <div class="activity-item">
-                    <div class="avatar">${log.initials}</div>
-                    <div class="action">${log.action_text}</div>
-                    <div class="time">${log.time_ago}</div>
+
+        if (data.length === 0) {
+
+            html = `
+                <div class="empty-state">
+                    No activity found.
                 </div>
             `;
-        });
-        document.getElementById('activity-list').innerHTML = html || '<p>No activity found.</p>';
+
+        } else {
+
+            data.forEach(log => {
+
+                html += `
+                    <div class="activity-item">
+
+                        <div class="avatar">
+                            ${log.initials}
+                        </div>
+
+                        <div class="activity-content">
+
+                            <div class="action">
+                                ${log.action_text}
+                            </div>
+
+                            <div class="time">
+                                ${log.time_ago}
+                            </div>
+
+                        </div>
+
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById('activity-list').innerHTML = html;
     });
 }
 
-document.getElementById('member-filter').addEventListener('change', loadActivity);
+
+document
+    .getElementById('member-filter')
+    .addEventListener('change', loadActivity);
+
 loadActivity();
